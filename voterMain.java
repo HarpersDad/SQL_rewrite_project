@@ -7,10 +7,14 @@ public class voterMain
 {
     public static void voterReports() throws IOException
     {
-        Date thisStart = new Date(2024 - 1900,1 - 1,01);
-        Date thisEnd = new Date(2024 - 1900,1 - 1,01);
+        Date thisStart = new Date(YYYY - 1900,MM - 1, DD);
+        Date thisEnd = new Date(YYYY - 1900,MM - 1, DD);
 
         String userName = "";
+        
+		// Kills specified application
+        Runtime rt = Runtime.getRuntime();
+        rt.exec("taskkill /F /IM APPLICATION.EXE");
 
         // test add transactions
         //add.addTransaction(thisStart, thisEnd, userName);
@@ -28,7 +32,16 @@ public class voterMain
         //EOdelete.eoDeleteTransaction(thisStart, thisEnd, userName);
 
         // test postcard notification
-        NotificationPostcards.postcardNotification(thisStart, thisEnd, userName);
+        //NotificationPostcards.postcardNotification(thisStart, thisEnd);
+
+        // test LocationList
+        //LocationList.getLocation(userName, "".toUpperCase(), "".toUpperCase(), "".toUpperCase(), false);
+
+        // test PrecinctList
+        //PrecinctList.getPrecincts(userName, "".toUpperCase(), "".toUpperCase(), "".toUpperCase(), true);
+
+        // test street descriptions
+        StreetDescriptions.streetDescs("", "", userName);
 
         System.exit(0);
     }

@@ -15,6 +15,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.TextAlignment;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
@@ -54,7 +55,7 @@ public class EOdelete
             Document doc = new Document(pdf);
             doc.setMargins(0f,0f,0f,0f);
 
-            pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new RotateEventHandler(PageSize.A4.rotate()));
+            pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new CommonFunctions.RotateEventHandler(PageSize.A4.rotate()));
 
             String startDateRange = startDate.toString().substring(5) + "/" + startDate.toString().substring(0,4);
             String endDateRange = endDate.toString().substring(5) + "/" + endDate.toString().substring(0,4);
@@ -62,11 +63,11 @@ public class EOdelete
             startDateRange = startDateRange.replace("-", "/");
             endDateRange = endDateRange.replace("-", "/");
 
-            Text text1 = new Text("REPORT DATE  "+ dateToday +"                                 VOTER PROCESSING SYSTEM                                   PAGE            1\n");
+            Text text1 = new Text("REPORT DATE  "+ dateToday +"                                 FCCO VOTER PROCESSING SYSTEM                                   PAGE            1\n");
             text1.setFontSize(fontSize);
 
             // Files ID to left side and Report Time to right side
-            Text text2 = new Text("USER  "+addPaddingR(user, 55)+"DELETE TRANSACTIONS                                          TIME  "+timeToday + "\n");
+            Text text2 = new Text("USER  "+CommonFunctions.addPaddingR(user, 55)+"DELETE TRANSACTIONS                                          TIME  "+timeToday + "\n");
             text2.setFontSize(fontSize);
 
             // add date range
@@ -96,41 +97,12 @@ public class EOdelete
             String filePath = "C:/Test/eoDelete.pdf";
             File file = new File(filePath);
 
-            //Desktop.getDesktop().print(file);
+            Desktop.getDesktop().open(file);
         }
         catch (Exception e)
         {
             throw new RuntimeException(e);
         }
-    }
-
-    public static String getSSN(String idNum)
-    {
-        String ssn = "";
-
-        try
-        {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String url = "";
-            Connection conn = DriverManager.getConnection(url);
-
-            PreparedStatement stmt = conn.prepareStatement("SELECT [SSN303] FROM [].[].[] WHERE [IDNUM303] = '" + idNum + "'");
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next())
-            {
-                ssn = rs.getString(1);
-
-
-                return ssn;
-            }
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        return ssn;
     }
 
     // function that adds data to the report
@@ -152,45 +124,46 @@ public class EOdelete
 
         try
         {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Class.forName("");
             String url = "";
             Connection conn = DriverManager.getConnection(url);
 
             PreparedStatement stmt = conn.prepareStatement("SELECT " +
-                    "[].[IDNUM300], " +
-                    "[].[SURNAME300], " +
-                    "[].[GIVEN300], " +
-                    "[].[MIDDLE300], " +
-                    "[].[RANK300], " +
-                    "[].[TRANCD307], " +
-                    "[].[REASON307], " +
-                    "[].[STATUS300], " +
-                    "[].[EOOFFR307], " +
-                    "[].[PRECODE307], " +
-                    "[].[PARTY307], " +
-                    "[].[NEXTREF300] " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[] " +
                     "FROM [] " +
                     "INNER JOIN [] " +
-                    "ON .IDNUM300 = .IDNUM307 " +
-                    "AND .TRANDTE307 " +
+                    "ON [].[] = [].[] " +
+                    "AND [].[] " +
                     "BETWEEN '"+start+"' AND '"+stop+"' " +
-                    "ORDER BY [].[SURNAME300] ASC, [].[GIVEN300]");
+                    "ORDER BY [].[] ASC, [].[]");
 
             ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                voterData[0] = rs.getString(1);   // id
-                voterData[1] = rs.getString(2);   // last
-                voterData[2] = rs.getString(3);   // first
-                voterData[3] = rs.getString(4);   // middle
-                voterData[4] = rs.getString(5);   // rank
-                voterData[5] = rs.getString(6);   // trans code
-                voterData[6] = rs.getString(7);   // reason
-                voterData[7] = rs.getString(8);   // status
-                voterData[8] = rs.getString(9);   // election officer status
-                voterData[9] = rs.getString(10);  // precinct code
-                voterData[10] = rs.getString(11); // party
-                voterData[11] = rs.getString(12); // next reference id
+            while (rs.next()) 
+			{
+                voterData[0] = rs.getString(1);
+                voterData[1] = rs.getString(2); 
+                voterData[2] = rs.getString(3); 
+                voterData[3] = rs.getString(4);
+                voterData[4] = rs.getString(5); 
+                voterData[5] = rs.getString(6); 
+                voterData[6] = rs.getString(7);
+                voterData[7] = rs.getString(8);  
+                voterData[8] = rs.getString(9);  
+                voterData[9] = rs.getString(10); 
+                voterData[10] = rs.getString(11);
+                voterData[11] = rs.getString(12); 
 
                 if (Objects.equals(voterData[8], "Y"))
                 {
@@ -203,7 +176,7 @@ public class EOdelete
                     String[] eoPOS = getEOPos(voterData[0]);
 
                     // get ssn
-                    ssn = getSSN(voterData[0]);
+                    ssn = CommonFunctions.getSSN(voterData[0]);
 
                     String formattedSSN = ssn.substring(0, 3) + "-" + ssn.substring(3, 5) + "-" + ssn.substring(5);
 
@@ -228,7 +201,7 @@ public class EOdelete
                     if (Objects.equals(voterData[7], "D"))
                     {
                         //                               LAST NAME + RANK                                             FIRST                                MIDDLE                        ID #                               SSN                                    PRECINCT                                                    PARTY                             POSITION                        CODE                   DELETE
-                        Text text1 = new Text(addPaddingR(voterData[1] + " " + voterData[4], 28) + addPaddingR(voterData[2], 19) + addPaddingR(voterData[3], 21) + addPaddingR(voterData[0], 9) + addPaddingR(formattedSSN, 15) + addPaddingR(voterData[9] + " " + eoPOS[2], 27) + addPaddingR(voterData[10], 5) + addPaddingR(eoPOS[1], 5) + addPaddingR(eoPOS[0], 6) + voterData[5] + "\n");
+                        Text text1 = new Text(CommonFunctions.addPaddingR(voterData[1] + " " + voterData[4], 28) + CommonFunctions.addPaddingR(voterData[2], 19) + CommonFunctions.addPaddingR(voterData[3], 21) + CommonFunctions.addPaddingR(voterData[0], 9) + CommonFunctions.addPaddingR(formattedSSN, 15) + CommonFunctions.addPaddingR(voterData[9] + " " + eoPOS[2], 27) + CommonFunctions.addPaddingR(voterData[10], 5) + CommonFunctions.addPaddingR(eoPOS[1], 5) + CommonFunctions.addPaddingR(eoPOS[0], 6) + voterData[5] + "\n");
                         text1.setFontSize(10);
 
                         Paragraph paragraph1 = new Paragraph();
@@ -249,7 +222,7 @@ public class EOdelete
                         count++;
 
                         // adds header to the top of each new page
-                        if (count == 11) // subtract 2
+                        if (count == 11)
                         {
                             // sets page number
                             page++;
@@ -257,44 +230,44 @@ public class EOdelete
 
                             if (Integer.toString(page).length() == 1)
                             {
-                                paddedPage = addPaddingR("PAGE", 15) + " " + page;
+                                paddedPage = CommonFunctions.addPaddingR("PAGE", 15) + " " + page;
                             }
 
                             if (Integer.toString(page).length() == 2)
                             {
-                                paddedPage = addPaddingR("PAGE", 14) + " " + page;
+                                paddedPage = CommonFunctions.addPaddingR("PAGE", 14) + " " + page;
                             }
 
                             if (Integer.toString(page).length() == 3)
                             {
-                                paddedPage = addPaddingR("PAGE", 13) + " " + page;
+                                paddedPage = CommonFunctions.addPaddingR("PAGE", 13) + " " + page;
                             }
 
                             if (Integer.toString(page).length() == 4)
                             {
-                                paddedPage = addPaddingR("PAGE", 12) + " " + page;
+                                paddedPage = CommonFunctions.addPaddingR("PAGE", 12) + " " + page;
                             }
 
                             if (Integer.toString(page).length() == 5)
                             {
-                                paddedPage = addPaddingR("PAGE", 11) + " " + page;
+                                paddedPage = CommonFunctions.addPaddingR("PAGE", 11) + " " + page;
                             }
 
                             if (Integer.toString(page).length() == 6)
                             {
-                                paddedPage = addPaddingR("PAGE", 10) + " " + page;
+                                paddedPage = CommonFunctions.addPaddingR("PAGE", 10) + " " + page;
                             }
 
                             if (Integer.toString(page).length() == 7)
                             {
-                                paddedPage = addPaddingR("PAGE", 9) + " " + page;
+                                paddedPage = CommonFunctions.addPaddingR("PAGE", 9) + " " + page;
                             }
 
-                            Text headerText1 = new Text("REPORT DATE  " + dateToday + "                                 VOTER PROCESSING SYSTEM                                   " + paddedPage + "\n");
+                            Text headerText1 = new Text("REPORT DATE  " + dateToday + "                                 FCCO VOTER PROCESSING SYSTEM                                   " + paddedPage + "\n");
                             headerText1.setFontSize(10);
 
                             // Files ID to left side and Report Time to right side
-                            Text headerText2 = new Text("USER  " + addPaddingR(user, 55) + "DELETE TRANSACTIONS                                          TIME  " + timeToday + "\n");
+                            Text headerText2 = new Text("USER  " + CommonFunctions.addPaddingR(user, 55) + "DELETE TRANSACTIONS                                          TIME  " + timeToday + "\n");
                             headerText2.setFontSize(10);
 
                             // add date range
@@ -327,37 +300,6 @@ public class EOdelete
         }
     }
 
-    // get precinct name
-    public static String getPrecinct(String precCode)
-    {
-        String precName = "";
-
-        try
-        {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String url = "";
-            Connection conn = DriverManager.getConnection(url);
-
-            PreparedStatement stmt = conn.prepareStatement("SELECT " +
-                    "[PRENAME500] " +
-                    "FROM [].[].[]" +
-                    "WHERE [PRECODE500] = '" + precCode + "'");
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next())
-            {
-                // the order that these are put into the array is the same as they are listed above
-                precName = rs.getString(1);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        return precName;
-    }
-
     // function to get eo pos
     public static String[] getEOPos(String voterID)
     {
@@ -367,16 +309,16 @@ public class EOdelete
 
         try
         {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Class.forName("");
             String url = "";
             Connection conn = DriverManager.getConnection(url);
 
             PreparedStatement stmt = conn.prepareStatement("SELECT " +
-                    "[EOCODE320], " +
-                    "[EOPOS320], " +
-                    "[PRESRVD320]" +
+                    "[], " +
+                    "[], " +
+                    "[]" +
                     "FROM [].[].[]" +
-                    "WHERE [IDNUM320] = '" + voterID + "'");
+                    "WHERE [] = '" + voterID + "'");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next())
@@ -401,33 +343,6 @@ public class EOdelete
             pos = "";
         }
 
-        return new String[]{code, pos, getPrecinct(prec)};
-    }
-
-    // function that adds whitespace to the string to pad the report
-    public static String addPaddingR(String str, int R)
-    {
-        if (str == null)
-        {
-            str = "";
-        }
-
-        String s = "";
-
-        StringBuilder strBuilder = new StringBuilder(s);
-
-        strBuilder.append(" ".repeat(Math.max(0, R - str.length())));
-        return str + strBuilder;
-    }
-
-    // function that sets the document orientation
-    private record RotateEventHandler(PageSize newPageSize) implements IEventHandler
-    {
-        @Override
-        public void handleEvent(Event event)
-        {
-            PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
-            docEvent.getPage().setMediaBox(newPageSize);
-        }
+        return new String[]{code, pos, CommonFunctions.getPrecName(prec)};
     }
 }

@@ -15,6 +15,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.TextAlignment;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
@@ -54,7 +55,7 @@ public class delete
             Document doc = new Document(pdf);
             doc.setMargins(0f,0f,0f,0f);
 
-            pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new RotateEventHandler(PageSize.A4.rotate()));
+            pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new CommonFunctions.RotateEventHandler(PageSize.A4.rotate()));
 
             String startDateRange = startDate.toString().substring(5) + "/" + startDate.toString().substring(0,4);
             String endDateRange = endDate.toString().substring(5) + "/" + endDate.toString().substring(0,4);
@@ -62,11 +63,11 @@ public class delete
             startDateRange = startDateRange.replace("-", "/");
             endDateRange = endDateRange.replace("-", "/");
 
-            Text text1 = new Text("REPORT DATE  "+ dateToday +"                                 VOTER PROCESSING SYSTEM                                   PAGE            1\n");
+            Text text1 = new Text("REPORT DATE  "+ dateToday +"                                 FCCO VOTER PROCESSING SYSTEM                                   PAGE            1\n");
             text1.setFontSize(fontSize);
 
             // Files ID to left side and Report Time to right side
-            Text text2 = new Text("USER  "+addPaddingR(user, 55)+"DELETE TRANSACTIONS                                          TIME  "+timeToday + "\n");
+            Text text2 = new Text("USER  "+CommonFunctions.addPaddingR(user, 55)+"DELETE TRANSACTIONS                                          TIME  "+timeToday + "\n");
             text2.setFontSize(fontSize);
 
             // add date range
@@ -96,41 +97,12 @@ public class delete
             String filePath = "C:/Test/delete.pdf";
             File file = new File(filePath);
 
-            //Desktop.getDesktop().print(file);
+            Desktop.getDesktop().open(file);
         }
         catch (Exception e)
         {
             throw new RuntimeException(e);
         }
-    }
-
-    public static String getSSN(String idNum)
-    {
-        String ssn = "";
-
-        try
-        {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String url = "";
-            Connection conn = DriverManager.getConnection(url);
-
-            PreparedStatement stmt = conn.prepareStatement("SELECT [SSN303] FROM [].[].[] WHERE [IDNUM303] = '" + idNum + "'");
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next())
-            {
-                ssn = rs.getString(1);
-
-
-                return ssn;
-            }
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        return ssn;
     }
 
     // function that adds data to the report
@@ -152,42 +124,41 @@ public class delete
 
         try
         {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Class.forName("");
             String url = "";
             Connection conn = DriverManager.getConnection(url);
 
             PreparedStatement stmt = conn.prepareStatement("SELECT " +
-                    "[].[IDNUM300], " +
-                    "[].[SURNAME300], " +
-                    "[].[GIVEN300], " +
-                    "[].[MIDDLE300], " +
-                    "[].[RANK300], " +
-                    "[].[TRANCD307], " +
-                    "[].[REASON307], " +
-                    "[].[STATUS300]" +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[], " +
+                    "[].[]" +
                     "FROM [] " +
                     "INNER JOIN [] " +
-                    "ON .IDNUM300 = .IDNUM307 " +
-                    "AND .TRANDTE307 " +
+                    "ON [].[] = [].[] " +
+                    "AND [].[] " +
                     "BETWEEN '"+start+"' AND '"+stop+"' " +
-                    "ORDER BY [].[SURNAME300] ASC, [].[GIVEN300]")
+                    "ORDER BY [].[] ASC, [].[]")
                     ;
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next())
             {
-                // vpmast300
-                voterData[0] = rs.getString(1);  // id
-                voterData[1] = rs.getString(2);  // last
-                voterData[2] = rs.getString(3);  // first
-                voterData[3] = rs.getString(4);  // middle
-                voterData[4] = rs.getString(5);  // rank
-                voterData[5] = rs.getString(6);  // code
-                voterData[6] = rs.getString(7);  // reason
-                voterData[7] = rs.getString(8);  // status
+                voterData[0] = rs.getString(1);
+                voterData[1] = rs.getString(2);
+                voterData[2] = rs.getString(3);
+                voterData[3] = rs.getString(4);
+                voterData[4] = rs.getString(5);
+                voterData[5] = rs.getString(6);
+                voterData[6] = rs.getString(7);
+                voterData[7] = rs.getString(8);
 
                 // get ssn
-                ssn = getSSN(voterData[0]);
+                ssn = CommonFunctions.getSSN(voterData[0]);
 
                 String formattedSSN = ssn.substring(0,3) + "-" + ssn.substring(3,5) + "-" + ssn.substring(5);
 
@@ -214,7 +185,7 @@ public class delete
                 if (Objects.equals(voterData[7], "D"))
                 {
                     //                               LAST NAME + RANK                                             FIRST                                MIDDLE                        ID #                               SSN                                    REASON
-                    Text text1 = new Text(addPaddingR(voterData[1] + " " + voterData[4], 44) + addPaddingR(voterData[2], 19) + addPaddingR(voterData[3], 21) + addPaddingR(voterData[0], 11) + addPaddingR(formattedSSN, 17) + voterData[5] + " " + voterData[6] + "\n");
+                    Text text1 = new Text(CommonFunctions.addPaddingR(voterData[1] + " " + voterData[4], 44) + CommonFunctions.addPaddingR(voterData[2], 19) + CommonFunctions.addPaddingR(voterData[3], 21) + CommonFunctions.addPaddingR(voterData[0], 11) + CommonFunctions.addPaddingR(formattedSSN, 17) + voterData[5] + " " + voterData[6] + "\n");
                     text1.setFontSize(10);
 
                     Paragraph paragraph1 = new Paragraph();
@@ -235,7 +206,7 @@ public class delete
                     count++;
 
                     // adds header to the top of each new page
-                    if (count == 11) // subtract 2
+                    if (count == 11)
                     {
                         // sets page number
                         page++;
@@ -243,44 +214,44 @@ public class delete
 
                         if (Integer.toString(page).length() == 1)
                         {
-                            paddedPage = addPaddingR("PAGE", 15) + " " + page;
+                            paddedPage = CommonFunctions.addPaddingR("PAGE", 15) + " " + page;
                         }
 
                         if (Integer.toString(page).length() == 2)
                         {
-                            paddedPage = addPaddingR("PAGE", 14) + " " + page;
+                            paddedPage = CommonFunctions.addPaddingR("PAGE", 14) + " " + page;
                         }
 
                         if (Integer.toString(page).length() == 3)
                         {
-                            paddedPage = addPaddingR("PAGE", 13) + " " + page;
+                            paddedPage = CommonFunctions.addPaddingR("PAGE", 13) + " " + page;
                         }
 
                         if (Integer.toString(page).length() == 4)
                         {
-                            paddedPage = addPaddingR("PAGE", 12) + " " + page;
+                            paddedPage = CommonFunctions.addPaddingR("PAGE", 12) + " " + page;
                         }
 
                         if (Integer.toString(page).length() == 5)
                         {
-                            paddedPage = addPaddingR("PAGE", 11) + " " + page;
+                            paddedPage = CommonFunctions.addPaddingR("PAGE", 11) + " " + page;
                         }
 
                         if (Integer.toString(page).length() == 6)
                         {
-                            paddedPage = addPaddingR("PAGE", 10) + " " + page;
+                            paddedPage = CommonFunctions.addPaddingR("PAGE", 10) + " " + page;
                         }
 
                         if (Integer.toString(page).length() == 7)
                         {
-                            paddedPage = addPaddingR("PAGE", 9) + " " + page;
+                            paddedPage = CommonFunctions.addPaddingR("PAGE", 9) + " " + page;
                         }
 
-                        Text headerText1 = new Text("REPORT DATE  "+ dateToday +"                                 VOTER PROCESSING SYSTEM                                   " + paddedPage + "\n");
+                        Text headerText1 = new Text("REPORT DATE  "+ dateToday +"                                 FCCO VOTER PROCESSING SYSTEM                                   " + paddedPage + "\n");
                         headerText1.setFontSize(10);
 
                         // Files ID to left side and Report Time to right side
-                        Text headerText2 = new Text("USER  "+addPaddingR(user, 55)+"DELETE TRANSACTIONS                                          TIME  "+timeToday + "\n");
+                        Text headerText2 = new Text("USER  "+CommonFunctions.addPaddingR(user, 55)+"DELETE TRANSACTIONS                                          TIME  "+timeToday + "\n");
                         headerText2.setFontSize(10);
 
                         // add date range
@@ -312,25 +283,4 @@ public class delete
         }
     }
 
-    // function that adds whitespace to the string to pad the report
-    public static String addPaddingR(String str, int R)
-    {
-        String s = "";
-
-        StringBuilder strBuilder = new StringBuilder(s);
-
-        strBuilder.append(" ".repeat(Math.max(0, R - str.length())));
-        return str + strBuilder;
-    }
-
-    // function that sets the document orientation
-    private record RotateEventHandler(PageSize newPageSize) implements IEventHandler
-    {
-        @Override
-        public void handleEvent(Event event)
-        {
-            PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
-            docEvent.getPage().setMediaBox(newPageSize);
-        }
-    }
 }
